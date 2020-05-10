@@ -191,9 +191,10 @@ class TLDetector(object):
         elif state == TrafficLight.RED:
             return "RED"
         elif state == TrafficLight.YELLOW:
-            return  "YELLOW"
+            return "YELLOW"
         elif state == TrafficLight.GREEN:
             return "GREEN"
+
 
 if __name__ == '__main__':
     try:
