@@ -1,6 +1,5 @@
-*.py[cod]
-
 build
 devel
-
-profile.tmp
+venv
+wget-log
+.idea
