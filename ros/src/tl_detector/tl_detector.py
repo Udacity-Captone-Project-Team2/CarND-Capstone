@@ -54,7 +54,6 @@ class TLDetector(object):
         self.last_state = TrafficLight.UNKNOWN
         self.last_wp = -1
         self.state_count = 0
-        self.skip_count = 1
 
         rospy.spin()
 
@@ -83,7 +82,6 @@ class TLDetector(object):
         self.camera_image = msg
         
         light_wp, state = self.process_traffic_lights()
-        self.skip_count = 1
 
         '''
         Publish upcoming red lights at camera frequency.
@@ -166,7 +164,6 @@ class TLDetector(object):
                     closest_light = light
                     line_idx = wp_pose
 
-        # Get the light state if the closest light is within 300       
         if closest_light:
             state = self.get_light_state(closest_light)
         else:
