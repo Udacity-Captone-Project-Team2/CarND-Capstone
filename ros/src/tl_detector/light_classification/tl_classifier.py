@@ -9,14 +9,14 @@ from styx_msgs.msg import TrafficLight
 class TLClassifier(object):
     def __init__(self):
         # Initialize the light as unknown
-        self.curr_light = TrafficLight.Unknown
+        self.curr_light = TrafficLight.UNKNOWN
         
         # Prepare the path to the traffic light simulator
         cwd = os.path.dirname(os.path.realpath(__file__))
-        model_path = os.path.join(cwd, "models/sim_model_mobilenet_v2_retrained.pb")
+        model_path = os.path.join(cwd, "models/tl_classifier_model_sim.pb")
         rospy.loginfo("Traffic light classification model path set to: {}".format(model_path))
         
-        self.tl_class_graph = tf.Graph
+        self.tl_class_graph = tf.Graph()
         with self.tl_class_graph.as_default():
             tl_class_graph_def = tf.GraphDef()
             with tf.gfile.GFile(model_path, 'rb') as fid:
@@ -37,19 +37,19 @@ class TLClassifier(object):
         config.gpu_options.per_process_gpu_memory_fraction = 0.5
 
         # Finish setup and set the TF session
-        self.sess = tf.Session(graph=self.tl_class_graph_def, config=config)
+        self.sess = tf.Session(graph=self.tl_class_graph, config=config)
         
         # Define the tensors for detection_graph
-        self.image_tensor = self.tl_class_graph_def.get_tensor_by_name('image_tensor:0')
+        self.image_tensor = self.tl_class_graph.get_tensor_by_name('image_tensor:0')
         
         # Each box represents a part of the image where a particular object was detected.
-        self.detection_boxes = self.tl_class_graph_def.get_tensor_by_name('detection_boxes:0')
+        self.detection_boxes = self.tl_class_graph.get_tensor_by_name('detection_boxes:0')
         
         # Each score represent how level of confidence for each of the objects.
         # Score is shown on the result image, together with the class label.
-        self.detection_scores = self.tl_class_graph_def.get_tensor_by_name('detection_scores:0')
-        self.detection_classes = self.tl_class_graph_def.get_tensor_by_name('detection_classes:0')
-        self.num_detections = self.tl_class_graph_def.get_tensor_by_name('num_detections:0')  
+        self.detection_scores = self.tl_class_graph.get_tensor_by_name('detection_scores:0')
+        self.detection_classes = self.tl_class_graph.get_tensor_by_name('detection_classes:0')
+        self.num_detections = self.tl_class_graph.get_tensor_by_name('num_detections:0')  
         
         rospy.loginfo("TLClassifier initialization complete.")
 
@@ -67,7 +67,7 @@ class TLClassifier(object):
         expanded_image = np.expand_dims(image, axis=0)
 
         # Retrieve the boxes, scores, classes, num from the tensors
-        (boxes, scores, classes, num) = self.tf_session.run([self.detection_boxes, 
+        (boxes, scores, classes, num) = self.sess.run([self.detection_boxes, 
                                                              self.detection_scores, 
                                                              self.detection_classes, 
                                                              self.num_detections],
@@ -87,9 +87,7 @@ class TLClassifier(object):
 
             if classes[0] == 1: 
                return TrafficLight.GREEN
-            elif classes[0] == 2: 
+            elif classes[0] == 2 or classes[0] == 3: 
                return TrafficLight.RED
-            elif classes[0] == 3: 
-               return TrafficLight.YELLOW
 
         return TrafficLight.UNKNOWN

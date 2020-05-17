@@ -15,7 +15,7 @@ from scipy.spatial import KDTree
 STATE_COUNT_THRESHOLD = 3
 
 # True if using simulated input for traffic light state and not output of CNN classifier
-USE_SIM_TL_DATA = True
+USE_SIM_TL_DATA = False
 
 class TLDetector(object):
     def __init__(self):
@@ -126,20 +126,14 @@ class TLDetector(object):
         if USE_SIM_TL_DATA:
             return light.state
         else:
-            pass
-
-            #######################################################
-            #           TODO: Stephen to Implement Classifier     #
-            #######################################################
-
-            # if(not self.has_image):
-            #     self.prev_light_loc = None
-            #     return False
-            #
-            # cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
-            #
-            # #Get classification
-            # return self.light_classifier.get_classification(cv_image)
+            if(not self.has_image):
+                self.prev_light_loc = None
+                return False
+            
+            cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+            
+            #Get classification
+            return self.light_classifier.get_classification(cv_image)
 
     def process_traffic_lights(self):
         """Finds closest visible traffic light, if one exists, and determines its
@@ -156,7 +150,7 @@ class TLDetector(object):
         # List of positions that correspond to the line to stop in front of for a given intersection
         stop_line_positions = self.config['stop_line_positions']
         if(self.pose):
-            car_position = self.get_closest_waypoint(self.pose.pose)
+            car_position = self.get_closest_waypoint(self.pose.pose.position.x, self.pose.pose.position.y)
 
             diff = len(self.waypoints.waypoints)
             for i, light in enumerate(self.lights):
