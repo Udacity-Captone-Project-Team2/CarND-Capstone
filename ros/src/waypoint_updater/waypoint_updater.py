@@ -47,7 +47,7 @@ class WaypointUpdater(object):
         self.loop()
     
     def loop(self):
-        rate = rospy.Rate(50)
+        rate = rospy.Rate(10) # 50Hz for Carla; 10Hz for Sim
 
         while not rospy.is_shutdown():
             if self.pose and self.base_lane:
@@ -124,8 +124,8 @@ class WaypointUpdater(object):
             self.waypoint_tree = KDTree(self.waypoints_2d)
 
     def traffic_cb(self, msg):
-        # TODO: Callback for /traffic_waypoint message. Implement
-        self.stop_line_wp_idx = msg.data
+        if self.stopline_wp_idx != msg.data:
+            self.stopline_wp_idx = msg.data
 
     def obstacle_cb(self, msg):
         # TODO: Callback for /obstacle_waypoint message. We will implement it later
