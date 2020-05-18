@@ -13,7 +13,7 @@ class TLClassifier(object):
         
         # Prepare the path to the traffic light simulator
         cwd = os.path.dirname(os.path.realpath(__file__))
-        model_path = os.path.join(cwd, "models/tl_classifier_model_sim_v3.pb")
+        model_path = os.path.join(cwd, "models/tl_classifier_model_sim_v3.pb") 
         rospy.loginfo("Traffic light classification model path set to: {}".format(model_path))
         
         self.tl_class_graph = tf.Graph()
